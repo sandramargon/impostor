@@ -45,14 +45,15 @@ function Partida(num, owner){
 		if (Object.keys(this.usuarios).length>=this.maximo){
 			this.fase=new Completado();
 		}
+	}
 			
-		this.iniciarPartida=function(){
+	this.iniciarPartida=function(){
 			this.fase.iniciarPartida(this);
-		}
 	}
 
 	this.agregarUsuario(owner);
 }
+
 
 function Inicial(){
 	this.agregarUsuario=function(nick,partida){
@@ -62,17 +63,21 @@ function Inicial(){
 		console.log("Faltan jugadores");
 	}
 }
-function Jugando(){
-	this.agregarUsuario=function(nick,partida){
-		console.log("La partida ya ha comenzado");
-	}
-}
 
 function Completado(){
 	this.iniciarPartida=function(partida){
 		partida.fase=new Jugando();
 	}
 	this.agregarUsuario=function(nick,partida){
+		console.log("La partida ya ha comenzado");
+	}
+}
+
+function Jugando(){
+	this.agregarUsuario=function(nick,partida){
+		console.log("La partida ya ha comenzado");
+	}
+	this.iniciarPartida=function(partida){
 
 	}
 }
@@ -80,7 +85,6 @@ function Completado(){
 function Final(){
 	this.agregarUsuario=function(nick,partida){
 		console.log("La partida ha terminado");
-		//this.puedeAgregarUsuario(nick);
 	}
 	this.iniciarPartida=function(partida){
 		
@@ -102,4 +106,4 @@ function Usuario(nick){
 
 function randomInt(low, high) {
 	return Math.floor(Math.random() * (high - low) + low);
-} //funcion auxiliar
+} 
