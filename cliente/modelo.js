@@ -1,12 +1,17 @@
 function Juego(){
 	this.partidas={};
 	this.crearPartida=function(num,owner){
-		let codigo=this.obtenerCodigo();
-		if (!this.partidas[codigo]){
-			this.partidas[codigo]=new Partida(num,owner.nick);
-			owner.partida=this.partidas[codigo];
+		//comprobar límites de num, no dejar crear partida sin los limites
+		if((num>=4)&&(num<=10)){
+			let codigo=this.obtenerCodigo();
+			if (!this.partidas[codigo]){
+				this.partidas[codigo]=new Partida(num,owner.nick);
+				owner.partida=this.partidas[codigo];
+			}
+			return codigo;
+		} else {
+			console.log("El numero de jugadores debe estar entre 4 y 10");
 		}
-		return codigo;
 	}
 	this.unirAPartida=function(codigo,nick){
 		if (this.partidas[codigo]){
@@ -42,6 +47,7 @@ function Partida(num,owner){
 			contador=contador+1;
 		}
 		this.usuarios[nuevo]=new Usuario(nuevo);
+		this.usuarios[nuevo].partida=this;
 		//this.comprobarMinimo();
 	}
 	this.comprobarMinimo=function(){
@@ -58,6 +64,13 @@ function Partida(num,owner){
 	}
 	this.eliminarUsuario=function(nick){
 		delete this.usuarios[nick];
+	}
+	this.puedeIniciarPartida=function(){
+		if(this.fase.nombre="completado"){
+			this.iniciarPartida();
+		} else{
+			console.log("Aun no hay suficientes jugadores");
+		}
 	}
 	this.agregarUsuario(owner);
 }
@@ -82,7 +95,11 @@ function Inicial(){
 function Completado(){
 	this.nombre="completado";
 	this.iniciarPartida=function(partida){
-		partida.fase=new Jugando();
+		//llame puedeIniciarPartida();
+		partida.puedeIniciarPartida();
+		//partida.fase=new Jugando();
+		//asignar encargos: secuencialmente a todos los usr
+		//asignar impostor: dado el array usuario (Object.keys)
 	}
 	this.agregarUsuario=function(nick,partida){
 		if (partida.comprobarMaximo()){
@@ -129,6 +146,8 @@ function Usuario(nick,juego){
 	this.nick=nick;
 	this.juego=juego;
 	this.partida;
+	this.impostor=false;
+	this.encargo="ninguno";
 	this.crearPartida=function(num){
 		return this.juego.crearPartida(num,this);
 	}
@@ -142,4 +161,21 @@ function Usuario(nick,juego){
 
 function randomInt(low, high) {
 	return Math.floor(Math.random() * (high - low) + low);
+}
+
+function inicio(){
+	juego=new Juego();
+	var usr=new Usuario("pepe",juego);
+	var codigo=usr.crearPartida(4);
+
+	if(codigo!=null){
+		juego.unirAPartida(codigo,"luis");
+		juego.unirAPartida(codigo,"luisa");
+		juego.unirAPartida(codigo,"luisito");
+		juego.unirAPartida(codigo,"pepe2");
+
+		usr.iniciarPartida();
+	}else{
+		console.log("Cambie el numero de jugadores");
+	}
 }
