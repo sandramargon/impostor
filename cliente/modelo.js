@@ -36,6 +36,7 @@ function Partida(num,owner){
 	this.nickOwner=owner;
 	this.fase=new Inicial();
 	this.usuarios={};
+	this.tareas=["jardines","calles","mobiliario","basuras"]; 
 	this.agregarUsuario=function(nick){
 		this.fase.agregarUsuario(nick,this)
 	}
@@ -67,12 +68,31 @@ function Partida(num,owner){
 	}
 	this.puedeIniciarPartida=function(){
 		if(this.fase.nombre="completado"){
-			this.iniciarPartida();
+			this.fase=new Jugando();
 		} else{
 			console.log("Aun no hay suficientes jugadores");
 		}
 	}
 	this.agregarUsuario(owner);
+	this.asignarTareas=function(){
+		for(nick in this.usuarios){
+			let numTarea="";
+			numTarea = Math.floor((Math.random() * this.tareas.length) + 0);
+			this.usuarios[nick].encargo=this.tareas[numTarea];
+		}
+	}
+	this.asignarImpostor=function(){
+		let numAleatorio="";
+		numAleatorio = Math.floor((Math.random() * (Object.keys(this.usuarios)).length)+ 0);
+		console.log(numAleatorio);
+		let num=0;			
+		for(nick in this.usuarios){
+			if(num==numAleatorio){
+				this.usuarios[nick].impostor=true;
+			} 
+			num++;
+		}
+	}
 }
 
 function Inicial(){
@@ -99,7 +119,9 @@ function Completado(){
 		partida.puedeIniciarPartida();
 		//partida.fase=new Jugando();
 		//asignar encargos: secuencialmente a todos los usr
+		partida.asignarTareas();
 		//asignar impostor: dado el array usuario (Object.keys)
+		partida.asignarImpostor();
 	}
 	this.agregarUsuario=function(nick,partida){
 		if (partida.comprobarMaximo()){
@@ -146,7 +168,7 @@ function Usuario(nick,juego){
 	this.nick=nick;
 	this.juego=juego;
 	this.partida;
-	this.impostor=false;
+	this.impostor=false;//un aleatorio que eleija uno de los usuarios de la partida y le asigna true a ese.
 	this.encargo="ninguno";
 	this.crearPartida=function(num){
 		return this.juego.crearPartida(num,this);
