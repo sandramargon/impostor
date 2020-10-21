@@ -5,7 +5,7 @@ function Juego(){
 		if((num>=4)&&(num<=10)){
 			let codigo=this.obtenerCodigo();
 			if (!this.partidas[codigo]){
-				this.partidas[codigo]=new Partida(num,owner.nick);
+				this.partidas[codigo]=new Partida(num,owner.nick,codigo);
 				owner.partida=this.partidas[codigo];
 			}
 			return codigo;
@@ -29,11 +29,15 @@ function Juego(){
 		}
 		return codigo.join('');
 	}
+	this.eliminarPartida=function(codigo){
+		delete this.partidas[codigo];
+	}
 }
 
-function Partida(num,owner){
+function Partida(num,owner,codigo){
 	this.maximo=num;
 	this.nickOwner=owner;
+	this.codigo=codigo;
 	this.fase=new Inicial();
 	this.usuarios={};
 	this.tareas=["jardines","calles","mobiliario","basuras"]; 
@@ -59,6 +63,9 @@ function Partida(num,owner){
 	}
 	this.iniciarPartida=function(){
 		this.fase.iniciarPartida(this);
+	}
+	this.puedeAbandonarPartida=function(){
+
 	}
 	this.abandonarPartida=function(nick){
 		this.fase.abandonarPartida(nick,this);
@@ -178,6 +185,15 @@ function Usuario(nick,juego){
 	}
 	this.abandonarPartida=function(){
 		this.partida.abandonarPartida(this.nick);
+		if(this.partida.numeroJugadores()>=0){
+			console.log(this.nick,"era el último jugador");
+		}
+	}
+	//matar¿?¿?
+	this.matar=function(){
+		if(this.impostor==true){
+			
+		}
 	}
 }
 
@@ -200,4 +216,5 @@ function inicio(){
 	}else{
 		console.log("Cambie el numero de jugadores");
 	}
+
 }

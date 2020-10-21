@@ -59,5 +59,31 @@ describe("El juego del impostor", function() {
 		usr.iniciarPartida();
 		expect(juego.partidas[codigo].fase.nombre).toEqual("jugando");
 	})
+		it("abandonar partida",function(){
+		juego.unirAPartida(codigo,"ana");
+	  	var num=Object.keys(juego.partidas[codigo].usuarios).length;
+	  	expect(num).toEqual(2);
+		expect(juego.partidas[codigo].fase.nombre).toEqual("inicial");
+		juego.unirAPartida(codigo,"isa");
+	  	var num=Object.keys(juego.partidas[codigo].usuarios).length;
+	  	expect(num).toEqual(3);
+		expect(juego.partidas[codigo].fase.nombre).toEqual("inicial");	  	
+		juego.unirAPartida(codigo,"tomas");
+	  	var num=Object.keys(juego.partidas[codigo].usuarios).length;
+	  	expect(num).toEqual(4);
+		expect(juego.partidas[codigo].fase.nombre).toEqual("completado");		
+		//usr.iniciarPartida();
+		//expect(juego.partidas[codigo].fase.nombre).toEqual("jugando");
+		var partida=juego.partidas[codigo];
+		partida.usuarios["tomas"].abandonarPartida();
+		expect(juego.partidas[codigo].fase.nombre).toEqual("jugando");
+		partida.usuarios["isa"].abandonarPartida();
+		partida.usuarios["ana"].abandonarPartida();
+		partida.usuarios["pepe"].abandonarPartida();
+		expect(partida.numeroJugadores()).toEqual(0);
+		juego.eliminarPartida(codigo);	
+		expect(juego.partidas[codigo]).toBe(undefined);
+	});
+		
    });
 })
