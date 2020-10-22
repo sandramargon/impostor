@@ -100,6 +100,66 @@ function Partida(num,owner,codigo){
 			num++;
 		}
 	}
+	this.numeroImpostoresVivos=function(){
+		let cont=0;
+		for (var key in this.usuarios) {
+			if (this.usuarios[key].impostor && this.usuarios[key].estado.vida=="vivo"){
+				cont++;
+			}
+		}
+		return cont;
+	}
+	this.numeroCiudadanosVivos=function(){
+		let numVivos=0;
+		for(nick in this.usuarios){
+			if(this.usuarios[nick].estado.vida=="vivo" && this.usuarios[nick].impostor==false){
+				numVivos++;
+			} 
+		}
+		return numVivos;
+	}
+	this.gananImpostores=function(){
+		//comprobar si impostores vivos >= ciudadanos vivos
+		//devuelve true o false pq es una comparacion
+		//cambiar fase a final en caso de true
+	}
+	this.gananCiudadanos=function(){
+		//comprobar numero impostores vivos es 0
+	}
+	this.votar=function(){
+		this.usuarios[sospechoso].esVotado();
+	}
+	this.masVotado=function(){
+		//let ...
+		let max=0;
+		//usr=undefined;
+		//Recorre los usuarios vivos y comprueba si max < votos de ese usuario
+		//en caso de cierto => actualiza max y guarda el usuario en una variable
+	}
+	this.numeroSkips=function(){
+		//numero de usuarios que han hecho skip
+		//recorrer usuarios vivos, incrementar contador si skip de ese usuario es tru
+		//usuario tiene votos, skip como nuevos atributos
+	}
+	this.reiniciarContadores=function(){
+	//recorrer usuarios y poner votos a 0 y skip a false
+	}
+	this.comprobarVotacion=function(){
+		let elegido=this.masVotado();
+		if (elegido && elegido.votos>this.numeroSkips()){
+			elegido.esAtacado();
+		}
+	}
+	this.comprobarFinal=function(){
+		if this.gananImpostores(){
+			this.finPartida();
+		} else if this.gananCiudadanos(){
+			this.finPartida()
+		}
+	}
+	this.finPartida=function(){
+		this.fase=new Final();
+	}
 }
 
 function Inicial(){
@@ -117,17 +177,18 @@ function Inicial(){
 		partida.eliminarUsuario(nick);
 		//comprobar si no quedan usr
 	}
+	this.atacar=function(nick,partida){
+		console.log("partida no comenzada");
+	}
+	this.lanzarVotacion=function(partida){}
 }
 
 function Completado(){
 	this.nombre="completado";
 	this.iniciarPartida=function(partida){
-		//llame puedeIniciarPartida();
 		partida.puedeIniciarPartida();
 		//partida.fase=new Jugando();
-		//asignar encargos: secuencialmente a todos los usr
 		partida.asignarTareas();
-		//asignar impostor: dado el array usuario (Object.keys)
 		partida.asignarImpostor();
 	}
 	this.agregarUsuario=function(nick,partida){
@@ -144,6 +205,10 @@ function Completado(){
 			partida.fase=new Inicial();
 		}
 	}
+		this.atacar=function(nick,partida){
+			console.log("aun no se puede atacar");
+	}
+	this.lanzarVotacion=function(partida){}
 }
 
 function Jugando(){
@@ -157,26 +222,51 @@ function Jugando(){
 		partida.eliminarUsuario(nick);
 		//comprobar si termina la partida
 	}
+	this.atacar=function(nick,partida){
+		if (partida.usuarios[nick].estado.vida=="vivo"){
+			partida.usuarios[nick].estado = new Muerto();
+		}
+	}
+	this.lanzarVotacion=function(partida){}
+}
+
+function Votacion(){
+	this.final="votacion";
+	this.agregarUsuario=function(nick,partida){}
+	this.iniciarPartida=function(partida){}
+	this.abandonarPartida=function(nick,partida){}
+	this.atacar=function(nick,partida){}
+	this.lanzarVotacion=function(partida){}
 }
 
 function Final(){
 	this.final="final";
-	this.agregarUsuario=function(nick,partida){
-		console.log("La partida ha terminado");
-	}
-	this.iniciarPartida=function(partida){
-	}
-	this.abandonarPartida=function(nick,partida){
-		//esto es absurdo
-	}
+	this.agregarUsuario=function(nick,partida){}
+	this.iniciarPartida=function(partida){}
+	this.abandonarPartida=function(nick,partida){}
+	this.atacar=function(nick,partida){}
+	this.lanzarVotacion=function(partida){}
+}
+
+
+function Vivo(){
+	this.vida="vivo";
+}
+function Muerto(){
+	this.vida="muerto";
+
 }
 
 function Usuario(nick,juego){
 	this.nick=nick;
 	this.juego=juego;
 	this.partida;
-	this.impostor=false;//un aleatorio que eleija uno de los usuarios de la partida y le asigna true a ese.
+	this.impostor=false;//un aleatorio que elija uno de los usuarios de la partida y le asigna true a ese.
 	this.encargo="ninguno";
+	this.estado=new Vivo();
+	this.votos=0;
+	this.skip=false;
+	this.haVotado=false;
 	this.crearPartida=function(num){
 		return this.juego.crearPartida(num,this);
 	}
@@ -189,10 +279,9 @@ function Usuario(nick,juego){
 			console.log(this.nick,"era el último jugador");
 		}
 	}
-	//matar¿?¿?
-	this.matar=function(){
+	this.atacar=function(nick){
 		if(this.impostor==true){
-			
+			this.partida.fase.atacar(nick,this.partida);
 		}
 	}
 }
