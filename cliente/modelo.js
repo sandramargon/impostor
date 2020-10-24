@@ -1,3 +1,4 @@
+//****JUEGO IMPOSTOR****//
 function Juego(){
 	this.partidas={};
 	this.crearPartida=function(num,owner){
@@ -34,6 +35,7 @@ function Juego(){
 	}
 }
 
+//****PARTIDA****//
 function Partida(num,owner,codigo){
 	this.maximo=num;
 	this.nickOwner=owner;
@@ -41,6 +43,8 @@ function Partida(num,owner,codigo){
 	this.fase=new Inicial();
 	this.usuarios={};
 	this.tareas=["jardines","calles","mobiliario","basuras"]; 
+
+//funciones del juego
 	this.agregarUsuario=function(nick){
 		this.fase.agregarUsuario(nick,this)
 	}
@@ -55,32 +59,43 @@ function Partida(num,owner,codigo){
 		this.usuarios[nuevo].partida=this;
 		//this.comprobarMinimo();
 	}
-	this.comprobarMinimo=function(){
-		return Object.keys(this.usuarios).length>=4
-	}
-	this.comprobarMaximo=function(){
-		return Object.keys(this.usuarios).length<this.maximo
-	}
 	this.iniciarPartida=function(){
 		this.fase.iniciarPartida(this);
-	}
-	this.puedeAbandonarPartida=function(){
-
-	}
-	this.abandonarPartida=function(nick){
-		this.fase.abandonarPartida(nick,this);
-	}
-	this.eliminarUsuario=function(nick){
-		delete this.usuarios[nick];
 	}
 	this.puedeIniciarPartida=function(){
 		if(this.fase.nombre="completado"){
 			this.fase=new Jugando();
+			this.asignarTareas();
+			this.asignarImpostor();
 		} else{
 			console.log("Aun no hay suficientes jugadores");
 		}
 	}
-	this.agregarUsuario(owner);
+	this.abandonarPartida=function(nick){
+		this.fase.abandonarPartida(nick,this);
+	}
+	this.puedeAbandonarPartida=function(){
+		this.eliminarUsuario(nick);
+		if(!this.comprobarMinimo()){
+			this.fase = new Inicial();
+		}
+	}
+	this.eliminarUsuario=function(nick){
+		delete this.usuarios[nick];
+	}
+
+//funciones obtener numeros
+	this.numeroJugadores=function(){
+		return Object.keys(this.usuarios).length;
+	}
+	this.comprobarMinimo=function(){
+		return this.numeroJugadores()>=4;
+	}
+	this.comprobarMaximo=function(){
+		return this.numeroJugadores()<=this.maximo;
+	}	
+
+//Impostor y Ciudadanos
 	this.asignarTareas=function(){
 		for(nick in this.usuarios){
 			let numTarea="";
@@ -118,50 +133,104 @@ function Partida(num,owner,codigo){
 		}
 		return numVivos;
 	}
-	this.gananImpostores=function(){
-		//comprobar si impostores vivos >= ciudadanos vivos
-		//devuelve true o false pq es una comparacion
-		//cambiar fase a final en caso de true
+
+//Votaciones
+	this.lanzarVotacion=function(){
+		this.fase.lanzarVotacion(this);
 	}
-	this.gananCiudadanos=function(){
-		//comprobar numero impostores vivos es 0
+	this.puedeLanzarVotacion=function(){
+		this.fase=new Votacion();
+		console.log("Comenzad las votaciones!");
 	}
-	this.votar=function(){
+	this.votar=function(sospechoso){
+		this.fase.votar(this,sospechoso);
+	}
+	this.puedeVotar=function(sospechoso){
 		this.usuarios[sospechoso].esVotado();
 	}
 	this.masVotado=function(){
-		//let ...
 		let max=0;
-		//usr=undefined;
-		//Recorre los usuarios vivos y comprueba si max < votos de ese usuario
-		//en caso de cierto => actualiza max y guarda el usuario en una variable
+		let usr = undefined;
+		for(var key in this.usuarios){
+			if(this.usuarios[key].estado.vida=="vivo"){
+				if(max < this.usuarios[key].votos){
+					max = this.usuarios[key].votos;
+					usr = this.usuarios[key];
+				}
+			}
+		}
+		return usr;
 	}
 	this.numeroSkips=function(){
-		//numero de usuarios que han hecho skip
-		//recorrer usuarios vivos, incrementar contador si skip de ese usuario es tru
-		//usuario tiene votos, skip como nuevos atributos
-	}
-	this.reiniciarContadores=function(){
-	//recorrer usuarios y poner votos a 0 y skip a false
+		let skips=0;
+		for(var usr in this.usuarios){
+			if(this.usuarios[usr].estado.vida=="vivo" && this.usuarios[usr].skip==true){
+				skips++;
+			}
+		}
+		return skips ;
 	}
 	this.comprobarVotacion=function(){
 		let elegido=this.masVotado();
 		if (elegido && elegido.votos>this.numeroSkips()){
-			elegido.esAtacado();
+			elegido.muere();
 		}
 	}
+	this.reiniciarContadores=function(){
+	//recorrer usuarios y poner votos a 0 y skip a false
+		this.fase=new Jugando();
+		for(var usr in this.usuarios){
+			if(this.usuarios[usr].estado.vida=="vivo"){
+				this.usuarios[usr].votos=0;
+				this.usuarios[usr].skip=false;	
+			}
+		}
+	}
+
+//Ataque del Impostor y muertes
+	this.matar=function(nick){
+		if(this.usuarios[nick]){
+			this.fase.matar(nick,this);
+		}else{
+			console.log("Usuario inexistente");
+		}
+	}
+	this.puedeMatar=function(nick){
+		this.usuarios[nick].muere();
+		this.comprobarFinal();
+	}
+
+//funciones fin de juego
+	this.gananImpostores=function(){
+		if(this.numeroImpostoresVivos()>=this.numeroCiudadanosVivos()){
+			this.fase = new Final();
+			console.log("VICTORIA IMPOSTOR");
+			return true;
+		}
+	}
+	this.gananCiudadanos=function(){
+		if(this.numeroImpostoresVivos()==0){
+			this.fase = new Final();
+			console.log("VICTORIA CIUDADANOS");
+			return true;
+		} 		
+	}
 	this.comprobarFinal=function(){
-		if this.gananImpostores(){
+		if (this.gananImpostores()){
 			this.finPartida();
-		} else if this.gananCiudadanos(){
+		} else if (this.gananCiudadanos()){
 			this.finPartida()
 		}
 	}
 	this.finPartida=function(){
 		this.fase=new Final();
+		console.log("La partida ha finalizado");
 	}
+
+	this.agregarUsuario(owner);
 }
 
+//*****FASES JUEGO*****//
 function Inicial(){
 	this.nombre="inicial";
 	this.agregarUsuario=function(nick,partida){
@@ -177,38 +246,40 @@ function Inicial(){
 		partida.eliminarUsuario(nick);
 		//comprobar si no quedan usr
 	}
-	this.atacar=function(nick,partida){
-		console.log("partida no comenzada");
+	this.matar=function(nick,partida){
+		console.log("Partida no comenzada");
 	}
 	this.lanzarVotacion=function(partida){}
+	this.votar=function(sospechoso){
+		console.log("Partida no comenzada");
+	}
 }
 
 function Completado(){
 	this.nombre="completado";
 	this.iniciarPartida=function(partida){
 		partida.puedeIniciarPartida();
-		//partida.fase=new Jugando();
-		partida.asignarTareas();
-		partida.asignarImpostor();
 	}
 	this.agregarUsuario=function(nick,partida){
 		if (partida.comprobarMaximo()){
 			partida.puedeAgregarUsuario(nick);
 		}
 		else{
-			console.log("Lo siento, numero máximo")
+			console.log("Lo siento, numero maximo");
 		}
 	}
 	this.abandonarPartida=function(nick,partida){
-		partida.eliminarUsuario(nick);
-		if (!partida.comprobarMinimo()){
-			partida.fase=new Inicial();
-		}
+		partida.puedeAbandonarPartida(nick);
 	}
-		this.atacar=function(nick,partida){
-			console.log("aun no se puede atacar");
+	this.matar=function(nick,partida){
+		console.log("Aun no se puede atacar");
 	}
-	this.lanzarVotacion=function(partida){}
+	this.lanzarVotacion=function(partida){
+			console.log("Aun no se puede votar");
+	}
+	this.votar=function(sospechoso){
+		console.log("Partida no comenzada");
+	}
 }
 
 function Jugando(){
@@ -216,47 +287,76 @@ function Jugando(){
 	this.agregarUsuario=function(nick,partida){
 		console.log("La partida ya ha comenzado");
 	}
-	this.iniciarPartida=function(partida){
-	}
+	this.iniciarPartida=function(partida){}
 	this.abandonarPartida=function(nick,partida){
-		partida.eliminarUsuario(nick);
+		partida.puedeAbandonarPartida(nick);
 		//comprobar si termina la partida
 	}
-	this.atacar=function(nick,partida){
-		if (partida.usuarios[nick].estado.vida=="vivo"){
-			partida.usuarios[nick].estado = new Muerto();
-		}
+	this.matar=function(nick,partida){
+		partida.puedeMatar(nick);
 	}
-	this.lanzarVotacion=function(partida){}
+	this.lanzarVotacion=function(partida){
+		partida.puedeLanzarVotacion();
+	}
+	this.votar=function(sospechoso){
+		console.log("Las votaciones aun no han comenzado");
+	}
 }
 
 function Votacion(){
 	this.final="votacion";
 	this.agregarUsuario=function(nick,partida){}
 	this.iniciarPartida=function(partida){}
-	this.abandonarPartida=function(nick,partida){}
-	this.atacar=function(nick,partida){}
-	this.lanzarVotacion=function(partida){}
+	this.abandonarPartida=function(nick,partida){
+		console.log("Espera, se esta votando");
+	}
+	this.matar=function(nick,partida){
+		console.log("Se esta votando!");
+	}
+	this.lanzarVotacion=function(partida){
+		console.log("Aun no ha terminado la votacion, no puedes empezar una nueva");
+	}
+	this.votar=function(partida,sospechoso){
+		partida.puedeVotar(sospechoso);
+	}
 }
 
 function Final(){
 	this.final="final";
-	this.agregarUsuario=function(nick,partida){}
+	this.agregarUsuario=function(nick,partida){
+		console.log("La partida ya ha terminado");
+	}
 	this.iniciarPartida=function(partida){}
-	this.abandonarPartida=function(nick,partida){}
-	this.atacar=function(nick,partida){}
-	this.lanzarVotacion=function(partida){}
+	this.abandonarPartida=function(nick,partida){
+		console.log("La partida ya ha terminado");
+	}
+	this.matar=function(nick,partida){
+		console.log("La partida ya ha terminado");
+	}
+	this.lanzarVotacion=function(partida){
+		console.log("La partida ya ha terminado");
+	}
+	this.votar=function(sospechoso){
+		console.log("La partida ya ha terminado");
+	}
 }
 
-
+//****ESTADOS JUGADORES****//
 function Vivo(){
 	this.vida="vivo";
+	this.lanzarVotacion=function(usr){
+		usr.puedeLanzarVotacion();
+	}
 }
+
 function Muerto(){
 	this.vida="muerto";
-
+	this.lanzarVotacion=function(usr){
+		console.log("No puede votar, ha muerto :(");
+	}
 }
 
+//****USUARIO****//
 function Usuario(nick,juego){
 	this.nick=nick;
 	this.juego=juego;
@@ -267,6 +367,8 @@ function Usuario(nick,juego){
 	this.votos=0;
 	this.skip=false;
 	this.haVotado=false;
+
+//funciones de inicio
 	this.crearPartida=function(num){
 		return this.juego.crearPartida(num,this);
 	}
@@ -276,14 +378,53 @@ function Usuario(nick,juego){
 	this.abandonarPartida=function(){
 		this.partida.abandonarPartida(this.nick);
 		if(this.partida.numeroJugadores()>=0){
-			console.log(this.nick,"era el último jugador");
+			console.log(this.nick,"era el ultimo jugador");
 		}
 	}
-	this.atacar=function(nick){
+
+//funciones de muertes
+	this.matar=function(nick){
 		if(this.impostor==true){
-			this.partida.fase.atacar(nick,this.partida);
+			this.partida.fase.matar(nick,this.partida);
 		}
 	}
+	this.muere=function(){
+		if (this.estado.vida=="vivo"){
+			this.estado = new Muerto();
+			this.partida.comprobarFinal();
+		} else {
+			console.log("No puedes matar a un Muerto");
+		}
+	}
+
+//funciones votacion
+	this.saltarVoto=function(){
+		if(this.haVotado==false){
+			this.skip=true;
+			this.haVotado=true;
+		} else{
+			console.log("SALTASTE LA VOTACION");
+		}
+		
+	}
+	this.lanzarVotacion=function(){
+		this.estado.lanzarVotacion(this);
+	}
+	this.puedeLanzarVotacion=function(){
+		this.partida.lanzarVotacion();
+	}
+	this.votar=function(sospechoso){
+		if(this.haVotado==false){
+			this.partida.votar(sospechoso);
+			this.haVotado=true;
+		}else{
+			console.log("YA HAS VOTADO!");
+		}
+	}
+	this.esVotado=function(){
+		this.votos++;
+	}
+
 }
 
 function randomInt(low, high) {
