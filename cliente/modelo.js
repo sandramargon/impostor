@@ -11,7 +11,8 @@ function Juego(){
 			}
 			return codigo;
 		} else {
-			console.log("El numero de jugadores debe estar entre 4 y 10");
+			let codigo="fallo";
+			return codigo;
 		}
 	}
 	this.unirAPartida=function(codigo,nick){
@@ -74,7 +75,7 @@ function Partida(num,owner,codigo){
 	this.abandonarPartida=function(nick){
 		this.fase.abandonarPartida(nick,this);
 	}
-	this.puedeAbandonarPartida=function(){
+	this.puedeAbandonarPartida=function(nick){
 		this.eliminarUsuario(nick);
 		if(!this.comprobarMinimo()){
 			this.fase = new Inicial();
@@ -243,7 +244,7 @@ function Inicial(){
 		console.log("Faltan jugadores");
 	}
 	this.abandonarPartida=function(nick,partida){
-		partida.eliminarUsuario(nick);
+		partida.puedeAbandonarPartida(nick);
 		//comprobar si no quedan usr
 	}
 	this.matar=function(nick,partida){
