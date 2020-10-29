@@ -1,6 +1,6 @@
 function clienteRest(){
-	this.crearPartida=function(nick,num){
-		$.getJSON("/crearPartida/"+nick+"/"+num,function(data){    
+	this.crearPartida=function(num,owner){
+		$.getJSON("/crearPartida/"+num+"/"+owner,function(data){    
     		console.log(data);
 		});
 
@@ -8,4 +8,10 @@ function clienteRest(){
 		$.getJSON("/unirAPartida/"+nick+"/"+codigo,function(data){    
     		console.log(data);
 		});
-}}}
+
+	this.listaPartidas=function(){
+		$.getJSON("/listaPartidas",function(data){    
+    		console.log(data);
+		});
+
+}}}}

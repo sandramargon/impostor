@@ -34,6 +34,19 @@ function Juego(){
 	this.eliminarPartida=function(codigo){
 		delete this.partidas[codigo];
 	}
+	this.listaPartidas=function(){
+		var lista=[];
+		var huecos=0;
+		for(var key in this.partidas){
+			var partida=this.partidas[key];
+			huecos=partida.obtenerHuecos();
+			if(huecos>0)
+			{
+				lista.push({"codigo":partida.codigo,"huecos":huecos});
+			}
+		}
+		return lista;
+	}
 }
 
 //****PARTIDA****//
@@ -45,6 +58,9 @@ function Partida(num,owner,codigo){
 	this.usuarios={};
 	this.tareas=["jardines","calles","mobiliario","basuras"]; 
 
+	this.obtenerHuecos=function(){
+		return this.maximo-this.numeroJugadores();
+	}
 //funciones del juego
 	this.agregarUsuario=function(nick){
 		this.fase.agregarUsuario(nick,this)

@@ -25,8 +25,8 @@ app.get('/', function (request, response) {
 //	var usr=new modelo.Usuario(nick);
 //});
 
-app.get('/crearPartida/:num/:nick',function(request,response){
-	var nick=request.params.nick;
+app.get('/crearPartida/:num/:owner',function(request,response){
+	var nick=request.params.owner;
 	var num=parseInt(request.params.num);
 	//ojo, nick nulo o numero nulo
 	//var num=4;
@@ -41,6 +41,11 @@ app.get('/unirAPartida/:nick/:codigo',function(request,response){
 	var codigo=request.params.codigo;
 	var res=juego.unirAPartida(nick,codigo);
 	response.send({"res":res});
+});
+
+app.get('/listaPartidas',function(request,response){
+	var lista=juego.listaPartidas();
+	response.send(lista);
 });
 
 server.listen(app.get('port'), function () {
