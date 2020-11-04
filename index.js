@@ -3,7 +3,12 @@ var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var bodyParser = require("body-parser");
+var io = require('socket.io').listen(server);  //modulo de socket io
+
 var modelo=require("./servidor/modelo.js");
+var wss=require("./servidor/servidorWS.js"); //dependencia del servidor de ws
+
+var servidorWS=new wss.servidorWS();//Creando la instancia de WS
 
 app.set('port', process.env.PORT || 5000);
 
@@ -55,3 +60,5 @@ server.listen(app.get('port'), function () {
 // app.listen(app.get('port'), function () {
 //      console.log('Node app is running on port', app.get('port'));
 // });
+
+servidorWS.lanzarSocketSrv(io,juego);

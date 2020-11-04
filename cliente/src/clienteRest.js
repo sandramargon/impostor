@@ -3,8 +3,10 @@ function clienteRest(){
 	this.crearPartida=function(num,owner,callback){
 		$.getJSON("/crearPartida/"+num+"/"+owner,function(data){    
     		console.log(data);
-    		callback(data);
+    		callback(data); //definida en las pruebas abajo
+    		//parar ruleta
 		});
+		//ruleta
 	}
 
 	this.unirAPartida=function(nick,codigo){
