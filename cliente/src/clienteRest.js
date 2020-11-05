@@ -15,8 +15,8 @@ function clienteRest(){
 		});
 	}
 
-	this.listaPartidas=function(){
-		$.getJSON("/listaPartidas",function(lista){    
+	this.listaPartidasDisponibles=function(){
+		$.getJSON("/listaPartidasDisponibles",function(lista){    
     		console.log(lista);
 		});
 	}

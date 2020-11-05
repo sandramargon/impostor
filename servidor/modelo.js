@@ -6,8 +6,8 @@ function Juego(){
 		if((num>=4)&&(num<=10)){
 			let codigo=this.obtenerCodigo();
 			if (!this.partidas[codigo]){
-				this.partidas[codigo]=new Partida(num,owner.nick,codigo);
-				owner.partida=this.partidas[codigo];
+				this.partidas[codigo]=new Partida(num,owner,codigo);
+				//owner.partida=this.partidas[codigo];
 			}
 			return codigo;
 		} else {
@@ -34,7 +34,7 @@ function Juego(){
 	this.eliminarPartida=function(codigo){
 		delete this.partidas[codigo];
 	}
-	this.listaPartidas=function(){
+	this.listaPartidasDisponibles=function(){
 		var lista=[];
 		var huecos=0;
 		for(var key in this.partidas){
@@ -47,15 +47,31 @@ function Juego(){
 		}
 		return lista;
 	}
+	this.listaPartidas=function(){
+		var lista=[];
+		for(var key in this.partidas){
+			var partida=this.partidas[key];
+			var owner=partida.nickOwner;
+				lista.push({"codigo":key,"owner":owner});
+		}
+		return lista;
+	}
+	this.iniciarPartida=function(nick,codigo){
+		var owner=this.partidas[codigo].nickOwner;
+		if(nick==owner){
+			this.partidas[codigo].iniciarPartida();
+		}
+	}
 }
 
 //****PARTIDA****//
-function Partida(num,owner,codigo){
+function Partida(num,owner,codigo,juego){
 	this.maximo=num;
 	this.nickOwner=owner;
 	this.codigo=codigo;
 	this.fase=new Inicial();
 	this.usuarios={};
+	this.juego=juego;//¿?nose si ha hecho esto
 	this.tareas=["jardines","calles","mobiliario","basuras"]; 
 
 	this.obtenerHuecos=function(){
@@ -95,6 +111,9 @@ function Partida(num,owner,codigo){
 		this.eliminarUsuario(nick);
 		if(!this.comprobarMinimo()){
 			this.fase = new Inicial();
+		}
+		if(this.numeroJugadores()<=0){
+			this.juego.eliminarPartida(this.codigo);
 		}
 	}
 	this.eliminarUsuario=function(nick){
@@ -390,7 +409,7 @@ function Usuario(nick,juego){
 		return this.juego.crearPartida(num,this);
 	}
 	this.iniciarPartida=function(){
-		this.partida.iniciarPartida();
+		this.partida.iniciarPartida(this.partida,this.nick);
 	}
 	this.abandonarPartida=function(){
 		this.partida.abandonarPartida(this.nick);
