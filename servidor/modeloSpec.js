@@ -219,8 +219,8 @@ describe("El juego del impostor", function() {
 				juego.lanzarVotacion(nick,codigo);
 				partida.usuarios[nick].impostor=true;
 				partida.usuarios["ana"].impostor=false;
-				partida.usuarios["isa"].impostor=true;
-				partida.usuarios["tomas"].impostor=true;
+				partida.usuarios["isa"].impostor=false;
+				partida.usuarios["tomas"].impostor=false;
 				expect(partida.fase.nombre).toEqual("votacion");
 				juego.votar(nick,codigo,"tomas");
 				expect(partida.fase.nombre).toEqual("votacion");

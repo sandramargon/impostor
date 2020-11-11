@@ -205,7 +205,7 @@ function Partida(num,owner,codigo,juego){
 
 	this.puedeVotar=function(sospechoso){
 		this.usuarios[sospechoso].esVotado();
-		this.partida.comprobarVotacion();
+		this.comprobarVotacion();
 	}
 	this.masVotado=function(){
 		let max=0;
@@ -233,8 +233,8 @@ function Partida(num,owner,codigo,juego){
 	}
 	this.todosHanVotado=function(){
 		let res=true;
-		for(var usr in this.usuarios){
-			if(this.usuarios[usr].estado.nombte=="vivo" && !this.usuarios[usr].haVotado){
+		for (var key in this.usuarios) {
+			if (this.usuarios[key].estado.vida=="vivo" && !this.usuarios[key].haVotado){
 				res=false;
 				break;
 			}
@@ -338,7 +338,7 @@ function Inicial(){
 		console.log("Partida no comenzada");
 	}
 	this.lanzarVotacion=function(partida){}
-	this.votar=function(sospechoso){
+	this.votar=function(sospechoso,partida){
 		console.log("Partida no comenzada");
 	}
 }
@@ -365,7 +365,7 @@ function Completado(){
 	this.lanzarVotacion=function(partida){
 			console.log("Aun no se puede votar");
 	}
-	this.votar=function(sospechoso){
+	this.votar=function(sospechoso,partida){
 		console.log("Partida no comenzada");
 	}
 }
@@ -386,7 +386,7 @@ function Jugando(){
 	this.lanzarVotacion=function(partida){
 		partida.puedeLanzarVotacion();
 	}
-	this.votar=function(sospechoso){
+	this.votar=function(sospechoso,partida){
 		console.log("Las votaciones aun no han comenzado");
 	}
 }
@@ -424,7 +424,7 @@ function Final(){
 	this.lanzarVotacion=function(partida){
 		console.log("La partida ya ha terminado");
 	}
-	this.votar=function(sospechoso){
+	this.votar=function(sospechoso,partida){
 		console.log("La partida ya ha terminado");
 	}
 }
@@ -432,6 +432,10 @@ function Final(){
 //****ESTADOS JUGADORES****//
 function Vivo(){
 	this.vida="vivo";
+	this.muere=function(usr){
+		usr.estado=new Muerto();
+		usr.partida.comprobarFinal();
+	}
 	this.lanzarVotacion=function(usr){
 		usr.puedeLanzarVotacion();
 	}
@@ -439,9 +443,8 @@ function Vivo(){
 
 function Muerto(){
 	this.vida="muerto";
-	this.lanzarVotacion=function(usr){
-		console.log("No puede votar, ha muerto :(");
-	}
+	this.muere=function(usr){}
+	this.lanzarVotacion=function(usr){}
 }
 
 //****USUARIO****//
@@ -477,12 +480,7 @@ function Usuario(nick,juego){
 		}
 	}
 	this.muere=function(){
-		if (this.estado.vida=="vivo"){
-			this.estado = new Muerto();
-			this.partida.comprobarFinal();
-		} else {
-			console.log("No puedes matar a un Muerto");
-		}
+		this.estado.muere(this);
 	}
 
 //funciones votacion
@@ -504,8 +502,8 @@ function Usuario(nick,juego){
 	}
 	this.votar=function(sospechoso){
 		if(this.haVotado==false){
-			this.partida.votar(sospechoso);
 			this.haVotado=true;
+			this.partida.votar(sospechoso);
 		}else{
 			console.log("YA HAS VOTADO!");
 		}
