@@ -47,6 +47,37 @@ function servidorWS(){
 		    	var lista=juego.listaPartidasDisponibles();
 		    	cli.enviarRemitente(socket,"recibirListaPartidas",lista);
 		    });
+		    socket.on('lanzarVotacion',function(nick,codigo){
+		    	juego.lanzarVotacion(nick,codigo);
+		    	var partida=juego.partidas[codigo];
+		    	cli.enviarATodos(io, codigo, "votacion", partida.fase.nombre);
+		    });
+		    socket.on('saltarVoto',function(nick,codigo){
+		    	var partida=juego.partidas[codigo];
+		    	juego.saltarVoto(nick,codigo);
+		    	if(partida.todosHanVotado()){
+		    		var data={"elegido":partida.elegido,"fase":partida.fase.nombre};
+		    		cli.enviarATodos(io, codigo, "finalVotacion", data);
+		    	}
+		    	else{
+		    		cli.enviarATodos(io, codigo, "haVotado", partida.listaHanVotado());
+		    	}
+		    });
+		    socket.on('votar',function(nick,codigo,sospechoso){
+		    	var partida=juego.partidas[codigo];
+		    	juego.votar(nick,codigo,sospechoso);
+		    	if(partida.todosHanVotado()){
+		    		var data={"elegido":partida.elegido,"fase":partida.fase.nombre};
+		    		cli.enviarATodos(io, codigo, "finalVotacion", data);
+		    	}
+		    	else{
+		    		cli.enviarATodos(io, codigo, "haVotado", partida.listaHanVotado());
+		    	}
+		    });
+		    socket.on('obtenerEncargo',function(nick,codigo){
+		    	cli.enviarRemitente(socket,"recibirEncargo",juego.obtenerEncargo(nick,codigo));
+		    });
+		     
 		});
 	}
 }
