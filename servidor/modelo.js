@@ -79,7 +79,7 @@ function Juego(){
 		var res={};
 		var encargo=juego.partidas[codigo].usuarios[nick].tareas;
 		var impostor=juego.partidas[codigo].usuarios[nick].impostor;
-		res={"encargo":encargo,"impostor":impostor};
+		res={"nick":nick,"encargo":encargo,"impostor":impostor};
 		return res;
 	}
 	this.matar=function(nick,codigo,ciudadano){
@@ -200,8 +200,8 @@ function Partida(num,owner,codigo,juego){
 		this.fase.lanzarVotacion(this);
 	}
 	this.puedeLanzarVotacion=function(){
+		this.reiniciarContadoresVotaciones();
 		this.fase=new Votacion();
-		console.log("Comenzad las votaciones!");
 	}
 	this.votar=function(sospechoso){
 		this.fase.votar(sospechoso,this);
@@ -248,7 +248,7 @@ function Partida(num,owner,codigo,juego){
 	this.listaHanVotado=function(){
 		var lista=[];
 		for(var usr in this.usuarios){
-			if(this.usuarios[usr].estado.nombte=="vivo" && this.usuarios[usr].haVotado){
+			if(this.usuarios[usr].estado.vida=="vivo" && this.usuarios[usr].haVotado){
 				lista.push(usr);
 			}
 		}
@@ -266,7 +266,7 @@ function Partida(num,owner,codigo,juego){
 	}
 	this.finalVotacion=function(){
 		this.fase=new Jugando();
-		this.reiniciarContadoresVotaciones(); //haVotado, skip, elegido
+		//haVotado, skip, elegido
 		this.comprobarFinal();
 	}
 	this.reiniciarContadoresVotaciones=function(){

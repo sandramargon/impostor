@@ -10,9 +10,9 @@ function clienteWS(){
 		this.nick=nick;
 		this.socket.emit("crearPartida",numero,nick);
 	}
-	this.unirAPartida=function(nick,codigo){
+	this.unirAPartida=function(codigo,nick){
 		this.nick=nick;
-		this.socket.emit("unirAPartida",nick,codigo);
+		this.socket.emit("unirAPartida",codigo,nick);
 	}
 	this.iniciarPartida=function(){
 		this.socket.emit("iniciarPartida",this.nick,this.codigo);
@@ -78,7 +78,10 @@ function clienteWS(){
 		this.socket.on("recibirEncargo",function(data){
 			console.log(data);
 		});
-		this.socket.on("matarCiudadano",function(data){
+		this.socket.on("final",function(data){
+			console.log(data);
+		});
+		this.socket.on("muereInocente",function(data){
 			console.log(data);
 		});
 	}
@@ -92,9 +95,9 @@ function pruebasWS(){
 	ws4=new clienteWS();
 	var codigo=ws.codigo;
 
-	ws2.unirAPartida("Juani",codigo);
-	ws3.unirAPartida("Juana",codigo);
-	ws4.unirAPartida("Juanan",codigo);
+	ws2.unirAPartida(codigo,"Juani");
+	ws3.unirAPartida(codigo,"Juana");
+	ws4.unirAPartida(codigo,"Juanan");
 
 	//ws.iniciarPartida();
 	//ws.lanzarVotacion();
@@ -102,17 +105,17 @@ function pruebasWS(){
 }
 function saltarVotos(){
 	ws.saltarVoto();
-	ws1.saltarVoto();
 	ws2.saltarVoto();
 	ws3.saltarVoto();
+	ws4.saltarVoto();
 
 }
 function votaciones(){
 	ws.votar("juan");
-	ws1.votar("juan");
 	ws2.votar("juan");
 	ws3.votar("juan");
+	ws4.votar("juan");
 }
 function votaciones2(){
-	ws.votar("pepe");
+	ws.votar("sa");
 }

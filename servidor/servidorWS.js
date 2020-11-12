@@ -12,7 +12,6 @@ function servidorWS(){
     this.enviarATodosMenosRemitente=function(socket,nombre,mens,datos){
         socket.broadcast.to(nombre).emit(mens,datos);
     }
-
 	this.lanzarSocketSrv=function(io,juego){
 		var cli=this;
 		io.on('connection',function(socket){		    
@@ -22,9 +21,9 @@ function servidorWS(){
 				socket.join(codigo);	
 		       	cli.enviarRemitente(socket,"partidaCreada",{"codigo":codigo,"owner":nick});		        		        
 		    });
-		    socket.on('unirAPartida',function(nick,codigo){
+		    socket.on('unirAPartida',function(codigo,nick){
 		    	//nick nulo o codigo nulo
-		    	var res=juego.unirAPartida(nick,codigo);
+		    	var res=juego.unirAPartida(codigo,nick);
 		    	socket.join(codigo);
 		    	var owner=juego.partidas[codigo].nickOwner;
 		    	console.log("Usuario "+nick+" se une a partida "+codigo);
@@ -79,7 +78,14 @@ function servidorWS(){
 		    });
 		    socket.on('matarCiudadano',function(nick,codigo,ciudadano){
 		    	juego.matar(nick,codigo,ciudadano);
-		    	cli.enviarRemitente(socket,"matarCiudadano",nick);
+		    	var partida=juego.partidas[codigo];
+		    	var fase = partida.fase.nombre;
+		    	if(fase=="final"){
+		    		cli.enviarATodos(io,codigo,"final","ganan impostores");
+		    	}else{
+		    		cli.enviarRemitente(socket,"muereInocente",fase);
+		    	}
+		    	
 		    });
 		     
 		});
