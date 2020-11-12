@@ -35,6 +35,9 @@ function clienteWS(){
 	this.obtenerEncargo=function(){
 		this.socket.emit("obtenerEncargo",this.nick,this.codigo);
 	}
+	this.matar=function(){
+		this.socket.emit("matar",this.nick,this.codigo,ciudadano);
+	}
 	//servidor WS dentro del cliente
 	this.lanzarSocketSrv=function(){
 		var cli=this;
@@ -73,6 +76,9 @@ function clienteWS(){
 			console.log(data);
 		});
 		this.socket.on("recibirEncargo",function(data){
+			console.log(data);
+		});
+		this.socket.on("matarCiudadano",function(data){
 			console.log(data);
 		});
 	}

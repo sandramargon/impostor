@@ -77,6 +77,10 @@ function servidorWS(){
 		    socket.on('obtenerEncargo',function(nick,codigo){
 		    	cli.enviarRemitente(socket,"recibirEncargo",juego.obtenerEncargo(nick,codigo));
 		    });
+		    socket.on('matarCiudadano',function(nick,codigo,ciudadano){
+		    	juego.matar(nick,codigo,ciudadano);
+		    	cli.enviarRemitente(socket,"matarCiudadano",nick);
+		    });
 		     
 		});
 	}

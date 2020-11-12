@@ -6,7 +6,7 @@ function Juego(){
 		if((num>=4)&&(num<=10)){
 			let codigo=this.obtenerCodigo();
 			if (!this.partidas[codigo]){
-				this.partidas[codigo]=new Partida(num,owner,codigo);
+				this.partidas[codigo]=new Partida(num,owner,codigo,this);
 				//owner.partida=this.partidas[codigo];
 			}
 			return codigo;
@@ -81,6 +81,10 @@ function Juego(){
 		var impostor=juego.partidas[codigo].usuarios[nick].impostor;
 		res={"encargo":encargo,"impostor":impostor};
 		return res;
+	}
+	this.matar=function(nick,codigo,ciudadano){
+		var usr=this.partidas[codigo].usuarios[nick];
+		usr.matar(ciudadano);
 	}
 }
 
