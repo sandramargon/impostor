@@ -18,7 +18,7 @@ function controlWeb($) {
             var nick = $('#nick').val();
             var num = $('#num').val();
             $('#mostrarCrearPartida').remove();
-            ws.crearPartida(nick, num);
+            ws.crearPartida(num,nick);
         });
     }
 
