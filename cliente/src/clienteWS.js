@@ -47,6 +47,9 @@ function clienteWS(){
 		this.socket.on('partidaCreada',function(data){
 			cli.codigo=data.codigo;
 			console.log(data);
+			if(data.codigo != "fallo"){
+				cw.mostrarEsperandoRival();
+			}
 			//pruebasWS();
 		});
 		this.socket.on('unidoAPartida',function(data){
@@ -62,6 +65,7 @@ function clienteWS(){
 		});
 		this.socket.on('recibirListaPartidasDisponibles',function(lista){
 			console.log(lista);
+			cw.mostrarUnirAPartida(lista);
 		});
 		this.socket.on('recibirListaPartidas',function(lista){
 			console.log(lista);
