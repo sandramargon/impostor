@@ -2,11 +2,11 @@ function controlWeb($) {
     this.mostrarCrearPartida = function() {
         var cadena = '<div id="mostrarCrearPartida">';
         cadena = cadena + '<div class="form-group">';
-        cadena = cadena + '<label for="nick">Nick:</label>';
+        cadena = cadena + '<label for="nick" style="color:white">Nick:</label>';
         cadena = cadena + '<input type="text" class="form-control" id="nick">';
         cadena = cadena + '</div>';
         cadena = cadena + '<div class="form-group">';
-        cadena = cadena + '<label for="num">Número:</label>';
+        cadena = cadena + '<label for="num" style="color:white">Número:</label>';
         cadena = cadena + '<input type="text" class="form-control" id="num">';
         cadena = cadena + '</div>';
         cadena = cadena + '<button type="button" class="btn btn-warning" id="btnCrearPartida">Crear Partida</button>';
@@ -25,7 +25,8 @@ function controlWeb($) {
     this.mostrarEsperandoRival = function() {
     	$('#mER').remove();
         var cadena = '<div id="mER">';
-    	cadena=cadena+'<img src="cliente/img/giphy.gif">';
+        cadena=cadena+'<h2 style="color:black"><strong>Please wait...</strong></h2>'
+    	cadena=cadena+'<img src="cliente/img/impRun.gif">';
 		cadena = cadena + '</div>';
         $('#esperando').append(cadena);
     } 
