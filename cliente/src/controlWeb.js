@@ -7,7 +7,7 @@ function controlWeb($) {
         cadena = cadena + '</div>';
         cadena = cadena + '<div class="form-group">';
         cadena = cadena + '<label for="num" style="color:white">Número:</label>';
-        cadena = cadena + '<input type="text" class="form-control" id="num">';
+        cadena = cadena + '<input type="number" min="4" max="10" value="4" class="form-control" id="num">';
         cadena = cadena + '</div>';
         cadena = cadena + '<button type="button" class="btn btn-warning" id="btnCrearPartida">Crear Partida</button>';
         cadena = cadena + '</div>';
@@ -18,12 +18,19 @@ function controlWeb($) {
             var nick = $('#nick').val();
             var num = $('#num').val();
             $('#mostrarCrearPartida').remove();
-            ws.crearPartida(num,nick);
+            if(nick!="" && num){
+            	ws.crearPartida(num,nick);
+        	}
         });
     }
-
-    this.mostrarEsperandoRival = function() {
+    this.limpiar=function(){
     	$('#mER').remove();
+    	$('#mostrarCrearPartida').remove();
+    	$('#mUAP').remove();
+    }
+    this.mostrarEsperandoRival = function() {
+    	//$('#mER').remove();
+    	this.limpiar();    	
         var cadena = '<div id="mER">';
         cadena=cadena+'<h2 style="color:black"><strong>Please wait...</strong></h2>'
     	cadena=cadena+'<img src="cliente/img/impRun.gif">';
@@ -36,17 +43,20 @@ function controlWeb($) {
     	var cadena='<div id=mUAP">';
     	cadena=cadena+'<div class="list-group">';
     	for(var i=0; i<lista.length;i++){
-			cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' huecos: ' + lista[i].huecos + '</a>';    	}
+			var maximo=lista[i].maximo;
+			var numJugadores=maximo-lista[i].huecos;
+			cadena = cadena + '<a href="#" value="' + lista[i].codigo + '" class="list-group-item">' + lista[i].codigo + ' huecos: <span class="badge badge-warning">'+numJugadores+'/'+maximo+'</span></a>';    	
+		}
     	cadena=cadena+'</div>';
-    	cadena=cadena+'<button type="button" class="btn btn-warning" id="btnUnir">Unir a Partida</button>';
+    	cadena=cadena+'<button type="button" class="btn btn-warning" id="btnUnir" >Unir a Partida</button>';
     	cadena=cadena+'</div>';
 
-    	$('unirAPartida').append(cadena);
+    	$('#unirAPartida').append(cadena);
 
  		StoreValue = []; 
-    	$(".list-group a").click(function(){
+    	$('.list-group a').click(function(){
         	StoreValue = [];
-        	StoreValue.push($(this).attr("value")); // add text to array
+        	StoreValue.push($(this).attr('value')); // add text to array
     	});
 
 
@@ -54,7 +64,10 @@ function controlWeb($) {
             var nick = $('#nick').val();
             var codigo=StoreValue[0];
             $('#mUAP').remove();
-            ws.unirAPartida(codigo,nick);
+            if(nick!="" && codigo){
+            	ws.unirAPartida(codigo,nick);
+            }
+            
         });
     }
-}
+}//badgets

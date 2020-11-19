@@ -13,30 +13,27 @@
 
 </head>
 <body background="cliente/img/BG.png" height="100%" width="100%">
-
 	<div class="container">
-	<div class="jumbotron rounded-0 bg-primary text-light" style="background-image: url('cliente/img/cabImp.jpg'); background-repeat: no-repeat; background-size: cover; background-position: center center;">
-	<div class="container">
-		<div class="row">
-			<h2 style="color:#ffffff" >Impostor APP</h2>
-			<div id="crearPartida"></div>
-			<div id="unirAPartida"></div>
+		<div class="jumbotron rounded-0 bg-primary text-light" style="background-image: url('cliente/img/cabImp.jpg'); background-repeat: no-repeat; background-size: cover; background-position: center center;">
+			<div class="row">
+				<h2 style="color:#ffffff" >Impostor APP</h2>
+				<div id="crearPartida"></div>
+				<div id="unirAPartida"></div>
+			</div>
+		</div>
+		<div class="container" align="center">
+			<div class="row">
+				<div id="esperando"></div>
+			</div>
 		</div>
 	</div>
-</div>
-<div class="container" align="center">
-	<div class="row">
-		<div id="esperando"></div>
-	</div>
-</div>
-<script>
-	var rest=new clienteRest();
-	var ws=new clienteWS();
-	var cw=new controlWeb($);
-	cw.mostrarCrearPartida();
-	ws.listaPartidasDisponibles();
-</script>
-</div>
+	<script>
+		var rest=new clienteRest();
+		var ws=new clienteWS();
+		var cw=new controlWeb($);
+		cw.mostrarCrearPartida();
+		ws.listaPartidasDisponibles();
+	</script>
 </body>
 
 </html>

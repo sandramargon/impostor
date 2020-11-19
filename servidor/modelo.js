@@ -39,10 +39,11 @@ function Juego(){
 		var huecos=0;
 		for(var key in this.partidas){
 			var partida=this.partidas[key];
+			var maximo=partida.maximo;
 			huecos=partida.obtenerHuecos();
 			if(huecos>0)
 			{
-				lista.push({"codigo":partida.codigo,"huecos":huecos});
+				lista.push({"codigo":partida.codigo,"huecos":huecos,"maximo":maximo});
 			}
 		}
 		return lista;
