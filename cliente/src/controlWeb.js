@@ -30,7 +30,10 @@ function controlWeb($) {
     }
     this.mostrarEsperandoRival = function() {
     	//$('#mER').remove();
-    	this.limpiar();    	
+    	//this.limpiar();    	
+    	$('#mUAP').remove();
+    	$('#mER').remove();
+
         var cadena = '<div id="mER">';
         cadena=cadena+'<h2 style="color:black"><strong>Please wait...</strong></h2>'
     	cadena=cadena+'<img src="cliente/img/impRun.gif">';

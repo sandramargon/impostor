@@ -60,8 +60,12 @@ function clienteWS(){
 			console.log(nick+" se une a la partida");
 			//cli.iniciarPartida();
 		});
+		this.socket.on('esperando',function(fase){
+			console.log('esperando: '+fase);
+		});
 		this.socket.on('partidaIniciada',function(fase){
 			console.log("Partida esta en fase: "+fase);
+			lanzarJuego();
 		});
 		this.socket.on('recibirListaPartidasDisponibles',function(lista){
 			console.log(lista);

@@ -4,6 +4,11 @@
  *  - Tuxemon, https://github.com/Tuxemon/Tuxemon
  */
 
+function lanzarJuego(){
+  cw.limpiar();
+  game = new Phaser.Game(config);
+}
+
 const config = {
   type: Phaser.AUTO,
   width: 800,
@@ -23,9 +28,12 @@ const config = {
   }
 };
 
-const game = new Phaser.Game(config);
+//const game = new Phaser.Game(config);
 let cursors;
 let player;
+let jugadores;
+let recursos=[{nombre:"ana",frame:0},{nombre:"pepe",frame:3}];
+let game;
 let showDebug = false;
 
 function preload() {
@@ -38,7 +46,7 @@ function preload() {
   // If you don't use an atlas, you can do the same thing with a spritesheet, see:
   //  https://labs.phaser.io/view.html?src=src/animation/single%20sprite%20sheet.js
   //this.load.atlas("atlas", "cliente/assets/atlas/atlas.png", "cliente/assets/atlas/atlas.json");
-  this.load.spritesheet("gabe","cliente/assets/images/Female13-4.png",{frameWidth:32,frameHeight:32});
+  this.load.spritesheet("varios","cliente/assets/images/persons.png",{frameWidth:32,frameHeight:32});
 }
 
 function create() {
@@ -71,17 +79,18 @@ function create() {
     //.setSize(30, 40)
     //.setOffset(0, 24);
 
-  player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y,"gabe");
+  player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y,"varios",recursos[0].frame);
 
   // Watch the player and worldLayer for collisions, for the duration of the scene:
   this.physics.add.collider(player, worldLayer);
 
   // Create the player's walking animations from the texture atlas. These are stored in the global
   // animation manager so any sprite can access them.
-const anims = this.anims;
+  let nombre=recursos[0].nombre;
+  const anims = this.anims;
       anims.create({
-        key: "gabe-left-walk",
-        frames: anims.generateFrameNames("gabe", {
+        key: nombre+"gabe-left-walk",
+        frames: anims.generateFrameNames("varios", {
           //prefix: "misa-left-walk.",
           start: 3,
           end: 5,
@@ -157,7 +166,7 @@ const anims = this.anims;
   //     collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
   //     faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
   //   });
-  // });
+   });
 }
 
 function update(time, delta) {
@@ -197,9 +206,9 @@ function update(time, delta) {
     player.anims.stop();
 
     // If we were moving, pick and idle frame to use
-    if (prevVelocity.x < 0) player.setTexture("gabe", "gabe-left");
-    else if (prevVelocity.x > 0) player.setTexture("gabe", "gabe-right");
-    else if (prevVelocity.y < 0) player.setTexture("gabe", "gabe-back");
-    else if (prevVelocity.y > 0) player.setTexture("gabe", "gabe-front");
+    // if (prevVelocity.x < 0) player.setTexture("gabe", "gabe-left");
+    // else if (prevVelocity.x > 0) player.setTexture("gabe", "gabe-right");
+    // else if (prevVelocity.y < 0) player.setTexture("gabe", "gabe-back");
+    // else if (prevVelocity.y > 0) player.setTexture("gabe", "gabe-front");
   }
 }
