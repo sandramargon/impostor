@@ -12,14 +12,19 @@ function servidorWS(){
     this.enviarATodosMenosRemitente=function(socket,nombre,mens,datos){
         socket.broadcast.to(nombre).emit(mens,datos);
     }
+    this.enivarGlobal=function(socket,mens,datos){
+    	socket.broadcast.emit(mens,datos);
+    }
 	this.lanzarSocketSrv=function(io,juego){
 		var cli=this;
 		io.on('connection',function(socket){		    
 		    socket.on('crearPartida', function(numero,nick) {
-		        //var usr=new modelo.Usuario(nick);
 				var codigo=juego.crearPartida(numero,nick);
 				socket.join(codigo);	
 		       	cli.enviarRemitente(socket,"partidaCreada",{"codigo":codigo,"owner":nick});		        		        
+		    	//enviar a todos los clientes la lista de partidas
+		    	var lista=juego.listaPartidasDisponibles();
+		    	cli.enivarGlobal(socket,"recibirListaPartidasDisponibles",lista);
 		    });
 		    socket.on('unirAPartida',function(codigo,nick){
 		    	//nick nulo o codigo nulo
@@ -51,6 +56,18 @@ function servidorWS(){
 		    socket.on('listaPartidasDisponibles',function(){
 		    	var lista=juego.listaPartidasDisponibles();
 		    	cli.enviarRemitente(socket,"recibirListaPartidas",lista);
+		    });
+		    socket.on('estoyDentro',function(nick,codigo){
+		    	//var usr=juego.obtenerJugador(nick,codigo);
+		    	//var numero=juego.partidas[codigo].usuarios[nick].numJugador;
+		    	//var datos={nick:nick,numJugador:numero};
+		    	//cli.enviarATodosMenosRemitente(socket,codigo,"dibujarRemoto",datos);
+		    	var lista=juego.obtenerListaJugadores(Codigo);
+		    	cli.enviarRemitente(socket,"dibujarRemoto",lista);
+		    });
+		    socket.on('movimiento',function(nick,codigo,numJugador,direccion){
+		    	var datos={nick:nick,numJugador:numJugador,direccion:direccion}
+		    	cli.enviarATodosMenosRemitente(socket,codigo,"moverRemoto",datos);
 		    });
 		    socket.on('lanzarVotacion',function(nick,codigo){
 		    	juego.lanzarVotacion(nick,codigo);

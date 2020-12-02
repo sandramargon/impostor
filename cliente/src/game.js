@@ -28,13 +28,20 @@ const config = {
   }
 };
 
-//const game = new Phaser.Game(config);
+let game;// = new Phaser.Game(config);
 let cursors;
 let player;
-let jugadores;
-let recursos=[{nombre:"ana",frame:0},{nombre:"pepe",frame:3}];
-let game;
+//let player2;
+var jugadores={}; //la colección de jugadores remotos
 let showDebug = false;
+let camera;
+var worldLayer;
+let map;
+var crear;
+var spawnPoint;
+let recursos=[{frame:0,sprite:"ana"},{frame:3,nombre:"pepe"},{frame:6,nombre:"tom"},{frame:9,nombre:"rayo"}];
+
+
 
 function preload() {
   this.load.image("tiles", "cliente/assets/tilesets/tuxmon-sample-32px-extruded.png");
@@ -50,47 +57,43 @@ function preload() {
 }
 
 function create() {
-  const map = this.make.tilemap({ key: "map" });
+    crear=this;
+    map = crear.make.tilemap({ key: "map" });
 
-  // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
-  // Phaser's cache (i.e. the name you used in preload)
-  const tileset = map.addTilesetImage("tuxmon-sample-32px-extruded", "tiles");
+    // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
+    // Phaser's cache (i.e. the name you used in preload)
+    const tileset = map.addTilesetImage("tuxmon-sample-32px-extruded", "tiles");
 
-  // Parameters: layer name (or index) from Tiled, tileset, x, y
-  const belowLayer = map.createStaticLayer("Below Player", tileset, 0, 0);
-  const worldLayer = map.createStaticLayer("World", tileset, 0, 0);
-  const aboveLayer = map.createStaticLayer("Above Player", tileset, 0, 0);
+    // Parameters: layer name (or index) from Tiled, tileset, x, y
+    const belowLayer = map.createStaticLayer("Below Player", tileset, 0, 0);
+    worldLayer = map.createStaticLayer("World", tileset, 0, 0);
+    const aboveLayer = map.createStaticLayer("Above Player", tileset, 0, 0);
 
-  worldLayer.setCollisionByProperty({ collides: true });
+    worldLayer.setCollisionByProperty({ collides: true });
 
-  // By default, everything gets depth sorted on the screen in the order we created things. Here, we
-  // want the "Above Player" layer to sit on top of the player, so we explicitly give it a depth.
-  // Higher depths will sit on top of lower depth objects.
-  aboveLayer.setDepth(10);
+    // By default, everything gets depth sorted on the screen in the order we created things. Here, we
+    // want the "Above Player" layer to sit on top of the player, so we explicitly give it a depth.
+    // Higher depths will sit on top of lower depth objects.
+    aboveLayer.setDepth(10);
 
-  // Object layers in Tiled let you embed extra info into a map - like a spawn point or custom
-  // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
-  const spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
+    // Object layers in Tiled let you embed extra info into a map - like a spawn point or custom
+    // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
+    const spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
 
-  // Create a sprite with physics enabled via the physics system. The image used for the sprite has
-  // a bit of whitespace, so I'm using setSize & setOffset to control the size of the player's body.
-  //player = this.physics.add
-    //.sprite(spawnPoint.x, spawnPoint.y, "atlas", "misa-front")
-    //.setSize(30, 40)
-    //.setOffset(0, 24);
+    // Create a sprite with physics enabled via the physics system. The image used for the sprite has
+    // a bit of whitespace, so I'm using setSize & setOffset to control the size of the player's body.
+    // player = this.physics.add
+    //   .sprite(spawnPoint.x, spawnPoint.y, "atlas", "misa-front")
+    //   .setSize(30, 40)
+    //   .setOffset(0, 24);
 
-  player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y,"varios",recursos[0].frame);
+    // // Watch the player and worldLayer for collisions, for the duration of the scene:
+    //this.physics.add.collider(player, worldLayer);
 
-  // Watch the player and worldLayer for collisions, for the duration of the scene:
-  this.physics.add.collider(player, worldLayer);
-
-  // Create the player's walking animations from the texture atlas. These are stored in the global
-  // animation manager so any sprite can access them.
-  let nombre=recursos[0].nombre;
-  const anims = this.anims;
+     const anims = crear.anims;
       anims.create({
-        key: nombre+"gabe-left-walk",
-        frames: anims.generateFrameNames("varios", {
+        key: "gabe-left-walk",
+        frames: anims.generateFrameNames("gabe", {
           //prefix: "misa-left-walk.",
           start: 3,
           end: 5,
@@ -133,52 +136,162 @@ function create() {
         repeat: -1
       });
 
+      const anims2 = crear.anims;
+      anims2.create({
+        key: "ana-left-walk",
+        frames: anims.generateFrameNames("varios", {
+          start: 36,
+          end: 38,
+        }),
+        repeat: -1
+      });
+      anims2.create({
+        key: "ana-right-walk",
+        frames: anims.generateFrameNames("varios", {
+          start: 12,
+          end: 14,
+        }),
+        repeat: -1
+      });
+      anims2.create({
+        key: "ana-front-walk",
+        frames: anims.generateFrameNames("varios", {
+          //prefix: "misa-left-walk.",
+          start: 24,
+          end: 26,
+          //zeroPad: 3
+        }),
+        //frameRate: 10,
+        repeat: -1
+      });
+      anims2.create({
+        key: "ana-back-walk",
+        frames: anims.generateFrameNames("varios", {
+          //prefix: "misa-left-walk.",
+          start: 0,
+          end: 2,
+          //zeroPad: 3
+        }),
+        //frameRate: 10,
+        repeat: -1
+      });
 
-  const camera = this.cameras.main;
-  camera.startFollow(player);
-  camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+      const anims3 = crear.anims;
+      anims3.create({
+        key: "pepe-left-walk",
+        frames: anims.generateFrameNames("varios", {
+          //prefix: "misa-left-walk.",
+          start: 39,
+          end: 41,
+          //zeroPad: 3
+        }),
+        //frameRate: 10,
+        repeat: -1
+      });
+      anims3.create({
+        key: "pepe-right-walk",
+        frames: anims.generateFrameNames("varios", {
+          //prefix: "misa-left-walk.",
+          start: 15,
+          end: 17,
+          //zeroPad: 3
+        }),
+        //frameRate: 10,
+        repeat: -1
+      });
+      anims3.create({
+        key: "pepe-front-walk",
+        frames: anims.generateFrameNames("varios", {
+          //prefix: "misa-left-walk.",
+          start: 27,
+          end: 29,
+          //zeroPad: 3
+        }),
+        //frameRate: 10,
+        repeat: -1
+      });
+      anims3.create({
+        key: "pepe-back-walk",
+        frames: anims.generateFrameNames("varios", {
+          //prefix: "misa-left-walk.",
+          start: 3,
+          end: 5,
+          //zeroPad: 3
+        }),
+        //frameRate: 10,
+        repeat: -1
+      });
 
-  cursors = this.input.keyboard.createCursorKeys();
+    // const camera = this.cameras.main;
+    // camera.startFollow(player);
+    // camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
-  // Help text that has a "fixed" position on the screen
-  // this.add
-  //   .text(16, 16, 'Arrow keys to move\nPress "D" to show hitboxes', {
-  //     font: "18px monospace",
-  //     fill: "#000000",
-  //     padding: { x: 20, y: 10 },
-  //     backgroundColor: "#ffffff"
-  //   })
-  //   .setScrollFactor(0)
-  //   .setDepth(30);
+    cursors = crear.input.keyboard.createCursorKeys();
+    lanzarJugador(ws.numJugador);
+    ws.estoyDentro();
+  }
 
-  // Debug graphics
-  this.input.keyboard.once("keydown_D", event => {
-    // Turn on physics debugging to show player's hitbox
-    this.physics.world.createDebugGraphic();
 
-    // Create worldLayer collision graphic above the player, but below the help text
-  //   const graphics = this.add
-  //     .graphics()
-  //     .setAlpha(0.75)
-  //     .setDepth(20);
-  //   worldLayer.renderDebug(graphics, {
-  //     tileColor: null, // Color of non-colliding tiles
-  //     collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
-  //     faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
-  //   });
-   });
+function lanzarJugador(numJugador){
+    player = crear.physics.add.sprite(spawnPoint.x, spawnPoint.y,"varios",recursos[numJugador].frame);    
+    // Watch the player and worldLayer for collisions, for the duration of the scene:
+    crear.physics.add.collider(player, worldLayer);
+    //crear.physics.add.collider(player2, worldLayer);
+    camera = crear.cameras.main;
+    camera.startFollow(player);
+    camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+  }
+
+function lanzarJugadorRemoto(nick,numJugador){
+    var frame=recursos[numJugador].frame;
+    jugadores[nick] = crear.physics.add.sprite(spawnPoint.x+15*numJugador, spawnPoint.y,"varios",frame);    
+    crear.physics.add.collider(jugadores[nick], worldLayer);
+}
+
+function moverRemoto(direccion,nick,numJugador){
+  
+  var remoto=jugadores[nick];
+  const speed=175;
+  const prevVelocity=player.body.velocity.clone();
+  const nombre=recursos[numJugador].sprite;
+  remoto.body.setVelocity(0);
+  if(direccion=="left"){
+    player.body.setVelocityX(-speed);
+  }else if(direccion="rigth"){
+    player.body.setVelocityX(speed);
+  }
+  if(direccion=="up"){
+    player.body.setVelocityY(-speed);
+  }else if(direccion="down"){
+    player.body.setVelocityY(speed);
+  }
+  remoto.body.velocity.normalize().scale(speed);
+
+  if (direccion=="left") {
+    remoto.anims.play(nombre+"-left-walk", true);
+  } else if (direccion=="right") {
+    remoto.anims.play(nombre+"-right-walk", true);
+  } else if (direccion=="up") {
+    remoto.anims.play(nombre+"-back-walk", true);
+  } else if (direccion=="down") {
+    remoto.anims.play(nombre+"-front-walk", true);
+  } else {
+    remoto.anims.stop();
+    //creo que no falta nada, no se
 }
 
 function update(time, delta) {
   const speed = 175;
   const prevVelocity = player.body.velocity.clone();
 
+  const nombre=recursos[ws.numJugador].sprite;
   // Stop any previous movement from the last frame
   player.body.setVelocity(0);
 
   // Horizontal movement
   if (cursors.left.isDown) {
     player.body.setVelocityX(-speed);
+    ws.movimiento("left");
   } else if (cursors.right.isDown) {
     player.body.setVelocityX(speed);
   }
@@ -212,3 +325,4 @@ function update(time, delta) {
     // else if (prevVelocity.y > 0) player.setTexture("gabe", "gabe-front");
   }
 }
+

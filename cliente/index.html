@@ -7,26 +7,29 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="cliente/lib/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+	<script src="//cdn.jsdelivr.net/npm/phaser@3.16.2/dist/phaser.js"></script>
 	<script src="cliente/src/clienteRest.js"></script>
 	<script src="cliente/src/clienteWS.js"></script>
 	<script src="cliente/src/controlWeb.js"></script>
-	<script src="//cdn.jsdelivr.net/npm/phaser@3.16.2/dist/phaser.js"></script>
 	<script src="cliente/src/game.js"></script>
 
 </head>
 <body background="cliente/img/BG.png" height="100%" width="100%">
 	<div class="container">
 		<div class="jumbotron rounded-0 bg-primary text-light" style="background-image: url('cliente/img/cabImp.jpg'); background-repeat: no-repeat; background-size: cover; background-position: center center;">
-			<div class="row">
-				<h2 style="color:#ffffff" >Impostor APP</h2>
-				<div id="crearPartida"></div>
-				<div id="esperando"></div>
-				<div id="unirAPartida"></div>
-			</div>
-		</div>
-		<div class="row">
-			<div id="game-container"></div>
-		</div>
+			<h2 style="color:#ffffff" >Impostor APP</h2>
+			<div class="col-sm-6">
+	      	<div id="crearPartida"></div>
+	      	<div id="unirAPartida"></div>
+  		    <div id="esperando"></div>
+	    </div>
+	    <div class="col-sm-6">
+	      <div id="listaPartidas"></div>
+		  <div id="listaEsperando"></div>
+	    </div>
+	    <div class="row">
+	    	<div id="game-container"></div>
+	    </div>
 	</div>
 	<script>
 		var rest=new clienteRest();

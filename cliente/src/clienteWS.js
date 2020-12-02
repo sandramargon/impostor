@@ -2,7 +2,8 @@ function clienteWS(){
 	this.socket=undefined;
 	this.nick=undefined;
 	this.codigo=undefined;
-		this.ini=function(){
+	this.owner=false;
+	this.ini=function(){
 		this.socket=io.connect(); //hace una peticion de conexion al servidor que ha creado esto
 		this.lanzarSocketSrv();
 	}
@@ -11,7 +12,7 @@ function clienteWS(){
 		this.socket.emit("crearPartida",numero,nick);
 	}
 	this.unirAPartida=function(codigo,nick){
-		this.nick=nick;
+		//this.nick=nick;
 		this.socket.emit("unirAPartida",codigo,nick);
 	}
 	this.iniciarPartida=function(){
@@ -22,6 +23,10 @@ function clienteWS(){
 	}
 	this.listaPartidas=function(){
 		this.socket.emit("listaPartidas");
+	}
+	this.estoyDentro=function(){
+		this.socket.emit("estoyDentro",this.nick,this.codigo);
+
 	}
 	this.lanzarVotacion=function(){
 		this.socket.emit("lanzarVotacion",this.nick,this.codigo);
@@ -38,6 +43,9 @@ function clienteWS(){
 	this.matar=function(){
 		this.socket.emit("matar",this.nick,this.codigo,ciudadano);
 	}
+	this.movimiento=function(direccion){
+		this.socket.emit("movimiento",this.nick,this.codigo,this,numJugador,direccion);
+	}
 	//servidor WS dentro del cliente
 	this.lanzarSocketSrv=function(){
 		var cli=this;
@@ -48,13 +56,18 @@ function clienteWS(){
 			cli.codigo=data.codigo;
 			console.log(data);
 			if(data.codigo != "fallo"){
+				cli.owner=true;
+				cli.numJugador=0;
 				cw.mostrarEsperandoRival();
 			}
 			//pruebasWS();
 		});
 		this.socket.on('unidoAPartida',function(data){
 			cli.codigo=data.codigo;
+			cli.nick=data.nick; //
+			cli.numJugador=data.numJugador;
 			console.log(data);
+			cw.mostrarEsperandoRival(); //
 		});
 		this.socket.on('nuevoJugador',function(nick){
 			console.log(nick+" se une a la partida");
@@ -65,11 +78,17 @@ function clienteWS(){
 		});
 		this.socket.on('partidaIniciada',function(fase){
 			console.log("Partida esta en fase: "+fase);
-			lanzarJuego();
+			if(fase=="jugando"){
+				cli.obtenerEncargo();
+				cw.limpiar();
+				lanzarJuego();
+			}
 		});
 		this.socket.on('recibirListaPartidasDisponibles',function(lista){
 			console.log(lista);
-			cw.mostrarUnirAPartida(lista);
+			if(!cli.codigo){
+				cw.mostrarUnirAPartida(lista);
+			}
 		});
 		this.socket.on('recibirListaPartidas',function(lista){
 			console.log(lista);
@@ -91,6 +110,17 @@ function clienteWS(){
 		});
 		this.socket.on("muereInocente",function(data){
 			console.log(data);
+		});
+		this.socket.on("dibujarRemoto",function(lista){
+			console.log(lista);
+			for(var i=0;i<lista.length;i++){
+				if(lista[i].nick!=cli.nick){
+					lanzarJugadorRemoto(lista[i].nick,lista[i].numJugador);
+				}
+			}
+		});
+		this.socket.on("moverRemoto",function(datos){
+			moverRemoto(datos.direccion,datos.nick,datos.numJugador);
 		});
 	}
 	this.ini();

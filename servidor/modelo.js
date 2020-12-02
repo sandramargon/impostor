@@ -20,7 +20,9 @@ function Juego(){
 			this.partidas[codigo].agregarUsuario(nick);
 		}
 	}
-	
+	this.obtenerListaJugadores=function(codigo){
+		return this.partidas[codigo].obtenerListaJugadores();
+	}
 	this.obtenerCodigo=function(){
 		let cadena="ABCDEFGHIJKLMNOPQRSTUVXYZ";
 		let letras=cadena.split('');
@@ -100,6 +102,14 @@ function Partida(num,owner,codigo,juego){
 	this.elegido="no hay nadie elegido";
 	this.tareas=["jardines","calles","mobiliario","basuras"]; 
 
+	this.obtenerListaJugadores=function(){
+		var lista=[];
+		for (var key in this.usuarios){
+			var numero=this.usuarios[key].numJugador;
+			lista.push({nick:key,numJugador:numero});
+		}
+		return lista;
+	}
 	this.obtenerHuecos=function(){
 		return this.maximo-this.numeroJugadores();
 	}
@@ -116,8 +126,14 @@ function Partida(num,owner,codigo,juego){
 		}
 		this.usuarios[nuevo]=new Usuario(nuevo);
 		this.usuarios[nuevo].partida=this;
-		//this.comprobarMinimo();
+		this.usuarios[nuevo].numJugador=this.numeroJugadores()-1;
+		let numero = this.usuarios[nuevo].numJugador;
+		if(this.comprobarMinimo()){
+			this.fase=new Completado();
+		}
+		return{"codigo":this.codigo,"nick":nuevo,"numJugador":numero};
 	}
+
 	this.iniciarPartida=function(){
 		this.fase.iniciarPartida(this);
 	}
@@ -327,10 +343,10 @@ function Partida(num,owner,codigo,juego){
 function Inicial(){
 	this.nombre="inicial";
 	this.agregarUsuario=function(nick,partida){
-		partida.puedeAgregarUsuario(nick);
-		if (partida.comprobarMinimo()){
-			partida.fase=new Completado();
-		}		
+		return partida.puedeAgregarUsuario(nick);
+		//if (partida.comprobarMinimo()){
+		//	partida.fase=new Completado();
+		//}		
 	}
 	this.iniciarPartida=function(partida){
 		console.log("Faltan jugadores");
@@ -458,6 +474,7 @@ function Usuario(nick,juego){
 	this.juego=juego;
 	this.partida;
 	this.impostor=false;//un aleatorio que elija uno de los usuarios de la partida y le asigna true a ese.
+	this.numJugador;
 	this.encargo="ninguno";
 	this.estado=new Vivo();
 	this.votos=0;
