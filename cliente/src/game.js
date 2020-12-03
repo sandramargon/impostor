@@ -277,7 +277,7 @@ function moverRemoto(direccion,nick,numJugador){
     remoto.anims.play(nombre+"-front-walk", true);
   } else {
     remoto.anims.stop();
-    //creo que no falta nada, no se
+    //creo que no falta nada, no se...
 }
 
 function update(time, delta) {
